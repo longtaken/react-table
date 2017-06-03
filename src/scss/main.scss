@@ -1,0 +1,14 @@
+body{
+  background-color: #fff;
+  font-size: 0.5rem;
+}
+.mainTable{
+  width: 90%;
+  margin: 1rem auto;
+  .flexWrap{
+    display: flex;
+  }
+  .flexWidth{
+    flex:1;
+  }
+}

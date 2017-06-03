@@ -1,7 +1,8 @@
 const path = require('path');
-
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const entry_path=path.resolve(__dirname, 'src/js/index.js');
 const output_path=path.resolve(__dirname, "dist");
+const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 
 module.exports = {
   entry: entry_path, // string | object | array
@@ -11,7 +12,7 @@ module.exports = {
     // 必须是绝对路径（使用 Node.js 的 path 模块）
     filename: "bundle.js", // string
     // 「入口分块(entry chunk)」的文件名模板（出口分块？）
-    publicPath: "/assets/", // string
+    //publicPath: "/assets/", // string
     // 输出解析文件的目录，url 相对于 HTML 页面
   },
   module: {
@@ -31,16 +32,51 @@ module.exports = {
         // - 尽量避免 exclude，更倾向于使用 include
         loader: "babel-loader",
         options: {
-          presets: ["es2015","react"]
+          presets: ["env","react"],
+          plugins: ['transform-runtime']
         },
+      },
+      {
+        test: /\.scss$/,
+        exclude: [/node_modules/],
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          },
+          'postcss-loader',
+          {
+            loader: 'sass-loader',
+          }
+        ]
       },
     ],
   },
   devServer: {
     proxy: { // proxy URLs to backend development server
-      '/api': 'http://localhost:3000'
+      '/api': 'http://localhost:8080'
     },
     historyApiFallback: true, // true for index.html upon 404, object for multiple paths
     hot: true, // hot module replacement. Depends on HotModuleReplacementPlugin
   },
+  plugins: [
+    new HtmlWebpackPlugin({     // Create HTML file that includes references to bundled CSS and JS.
+      template: 'src/index.html',
+      title: 'table',
+      favicon:'./src/favicon.ico',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true
+      },
+      hash: true,
+      // 这样每次客户端页面就会根据这个hash来判断页面是否有必要刷新
+      // 在项目后续过程中，经常需要做些改动更新什么的，一但有改动，客户端页面就会自动更新！
+      inject: 'body'
+    }),
+    new OpenBrowserPlugin({ url: 'http://localhost:8080' })
+  ],
+  devtool: "eval-source-map",
 }
