@@ -3,6 +3,7 @@ import {render} from 'react-dom';
 import Main from './main.jsx';
 const root = document.getElementById('main');
 import '../scss/common.scss';
+window.Global={};
 
 let dataArr = [
     {
@@ -83,7 +84,7 @@ let dataArr = [
             }
         ]
     },
-]
+];
 
 render(
   <Main allData={dataArr} />,
